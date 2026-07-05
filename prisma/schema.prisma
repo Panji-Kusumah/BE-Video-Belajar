@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model courses {
+  id              Int           @id @default(autoincrement())
+  image           String        @db.VarChar(500)
+  title           String        @db.VarChar(255)
+  description     String        @db.Text
+  instructor      String        @db.VarChar(255)
+  role            String        @db.VarChar(255)
+  instructorImage String        @db.VarChar(500)
+  rating          Float?        @default(0) @db.Float
+  reviews         Int?          @default(0)
+  price           Int
+  originalPrice   Int?
+  category        String        @db.VarChar(100)
+  duration        String        @db.VarChar(100)
+  isFree          Boolean?      @default(false)
+  createdAt       DateTime?     @default(now()) @db.DateTime(0)
+  updatedAt       DateTime?     @default(now()) @db.DateTime(0)
+  enrollments     enrollments[]
+  order_items     order_items[]
+
+  @@map("courses")
+}
+
+model users {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  email       String        @unique(map: "email") @db.VarChar(255)
+  phone       String?       @db.VarChar(20)
+  password    String        @db.VarChar(255)
+  role        users_role?   @default(user)
+  avatar      String?       @db.VarChar(500)
+  created_at  DateTime?     @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?     @default(now()) @db.Timestamp(0)
+  enrollments enrollments[]
+  orders      orders[]
+
+  @@map("users")
+}
+
+model enrollments {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  courseId    Int
+  progress    Float?    @default(0) @db.Float
+  status      String?   @default("active") @db.VarChar(50)
+  enrolledAt  DateTime? @default(now()) @db.DateTime(0)
+  completedAt DateTime? @db.DateTime(0)
+  users       users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "enrollments_ibfk_1")
+  courses     courses   @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "enrollments_ibfk_2")
+
+  @@unique([userId, courseId], map: "unique_enrollment")
+  @@index([courseId], map: "courseId")
+}
+
+model order_items {
+  id       Int     @id @default(autoincrement())
+  orderId  Int
+  courseId Int
+  price    Int
+  orders   orders  @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_items_ibfk_1")
+  courses  courses @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_items_ibfk_2")
+
+  @@index([courseId], map: "courseId")
+  @@index([orderId], map: "orderId")
+}
+
+model orders {
+  id            Int           @id @default(autoincrement())
+  invoiceNumber String        @unique(map: "invoiceNumber") @db.VarChar(100)
+  userId        Int
+  totalAmount   Int
+  status        String?       @default("Menunggu") @db.VarChar(50)
+  paymentMethod String?       @db.VarChar(100)
+  createdAt     DateTime?     @default(now()) @db.DateTime(0)
+  updatedAt     DateTime?     @default(now()) @db.DateTime(0)
+  order_items   order_items[]
+  users         users         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "orders_ibfk_1")
+
+  @@index([userId], map: "userId")
+}
+
+enum users_role {
+  user
+  admin
+}
