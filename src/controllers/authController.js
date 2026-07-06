@@ -6,17 +6,13 @@ import jwt from 'jsonwebtoken';
 export const register = async (req, res) => {
     try {
         const { name, email, password, phone } = req.body;
-
         const existingUser = await prisma.users.findUnique({
             where: { email },
         });
-
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'Email sudah terdaftar' });
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const user = await prisma.users.create({
             data: {
                 name,
@@ -25,13 +21,11 @@ export const register = async (req, res) => {
                 phone,
             },
         });
-
         const token = jwt.sign(
             { userId: user.id, email: user.email },
             process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '7d' }
         );
-
         res.status(201).json({
             success: true,
             message: 'Registrasi berhasil',
@@ -53,27 +47,21 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
         const user = await prisma.users.findUnique({
             where: { email },
         });
-
         if (!user) {
             return res.status(401).json({ success: false, message: 'Email atau password salah' });
         }
-
         const isValidPassword = await bcrypt.compare(password, user.password);
-
         if (!isValidPassword) {
             return res.status(401).json({ success: false, message: 'Email atau password salah' });
         }
-
         const token = jwt.sign(
             { userId: user.id, email: user.email },
             process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '7d' }
         );
-
         res.json({
             success: true,
             message: 'Login berhasil',
@@ -107,7 +95,6 @@ export const getMe = async (req, res) => {
                 created_at: true,
             },
         });
-
         res.json({ success: true, data: user });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

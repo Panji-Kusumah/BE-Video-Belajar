@@ -3,15 +3,12 @@ import prisma from '../config/prisma.js';
 export const getMyEnrollments = async (req, res) => {
     try {
         const { status, page = 1, limit = 10 } = req.query;
-
         const where = {
             userId: req.user.userId,
         };
-
         if (status) {
             where.status = status;
         }
-
         const enrollments = await prisma.enrollments.findMany({
             where,
             include: {
@@ -21,9 +18,7 @@ export const getMyEnrollments = async (req, res) => {
             skip: (parseInt(page) - 1) * parseInt(limit),
             take: parseInt(limit),
         });
-
         const total = await prisma.enrollments.count({ where });
-
         res.json({
             success: true,
             data: enrollments,
@@ -50,11 +45,9 @@ export const getEnrollmentByCourse = async (req, res) => {
                 courses: true,
             },
         });
-
         if (!enrollment) {
             return res.status(404).json({ success: false, message: 'Enrollment tidak ditemukan' });
         }
-
         res.json({ success: true, data: enrollment });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -64,7 +57,6 @@ export const getEnrollmentByCourse = async (req, res) => {
 export const updateProgress = async (req, res) => {
     try {
         const { progress } = req.body;
-
         const enrollment = await prisma.enrollments.update({
             where: {
                 userId_courseId: {
@@ -78,7 +70,6 @@ export const updateProgress = async (req, res) => {
                 status: progress === 100 ? 'completed' : 'active',
             },
         });
-
         res.json({
             success: true,
             message: 'Progress berhasil diupdate',
@@ -94,21 +85,18 @@ export const getEnrollmentStats = async (req, res) => {
         const totalEnrollments = await prisma.enrollments.count({
             where: { userId: req.user.userId },
         });
-
         const completedEnrollments = await prisma.enrollments.count({
             where: {
                 userId: req.user.userId,
                 status: 'completed',
             },
         });
-
         const activeEnrollments = await prisma.enrollments.count({
             where: {
                 userId: req.user.userId,
                 status: 'active',
             },
         });
-
         res.json({
             success: true,
             data: {

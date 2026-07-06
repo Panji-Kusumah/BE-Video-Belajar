@@ -8,18 +8,13 @@ import enrollmentRoutes from './routes/enrollmentRoutes.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
-
 const app = express();
-
-// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Routes
 app.get('/', (req, res) => {
     res.json({
         success: true,
-        message: '🚀 VideoBelajar API is running',
+        message: ' VideoBelajar API is running',
         endpoints: {
             auth: '/api/auth',
             courses: '/api/courses',
@@ -34,12 +29,10 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 
-// Error handling
+
 app.use(notFound);
 app.use(errorHandler);
-
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`✅ Server running on port localhost:${PORT}`);
 });
