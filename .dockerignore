@@ -1,0 +1,34 @@
+# Node dependencies & logs
+**/node_modules
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# Environment & local secrets
+**/.env
+**/.env.*
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Git & IDEs
+**/.git
+**/.gitignore
+**/.vscode
+**/.vs
+**/.idea
+
+# Docker build files
+**/Dockerfile*
+**/docker-compose*
+**/compose.y*ml
+**/.dockerignore
+
+# Build artifacts
+**/dist
+**/build
+**/.cache
+
+# Docs & misc
+LICENSE
+README.md
+README.Docker.md

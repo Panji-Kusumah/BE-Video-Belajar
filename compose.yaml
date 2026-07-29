@@ -1,0 +1,34 @@
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - JWT_SECRET=istrigwcantik
+      - DATABASE_URL=mysql://root:nukasep12@db:3306/videobelajar
+    command: sh -c "npx prisma db push && npm start"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: nukasep12
+      MYSQL_DATABASE: videobelajar
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pnukasep12"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
